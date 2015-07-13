@@ -16,6 +16,7 @@ $stdout.sync = true
 @xmpp = @config[:xmpp]
 
 require 'nitos_testbed_rc/cm_factory'
+require 'nitos_testbed_rc/cm'
 
 cm_entity_cert = File.expand_path(@auth[:entity_cert])
 cm_entity_key = File.expand_path(@auth[:entity_key])
@@ -228,9 +229,7 @@ OmfCommon.init(@config[:operationMode], opts) do |el|#communication: { url: "xmp
     info "CM Factory >> Connected to XMPP server"
     cmFact = OmfRc::ResourceFactory.create(:cm_factory, { uid: 'cm_factory', certificate: cm_entity })
 
-    comm.on_interrupted {
-      cmFact.disconnect
-    }
+    comm.on_interrupted { cmFact.disconnect }
   end
 end
 
