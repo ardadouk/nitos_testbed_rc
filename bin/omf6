@@ -293,6 +293,7 @@ def load(comm, options)
       port = nil
       controller.on_message do |m|
         if m.operation == :inform
+          next unless options[:target_nodes].include?(m.read_property('node_name'))
           case m.read_content("itype")
           when 'STATUS'
             unless m.read_property("current").nil? && m.read_property("desired").nil?
@@ -418,6 +419,7 @@ def create_imagezip_client(comm, fcontroller, node, port, options)
       client.on_subscribed do
         client.on_message do |client_msg|
           if client_msg.operation == :inform
+            next unless options[:target_nodes].include?(client_msg.read_property('node_name'))
             if client_msg.read_property("event") == "STDOUT"
               # print "#{client_msg.read_property("msg")}"
             elsif client_msg.read_property("event") == "EXIT"
@@ -504,6 +506,7 @@ def save(comm, options)
       port = nil
       controller.on_message do |m|
         if m.operation == :inform
+          next unless options[:target_nodes].include?(m.read_property('node_name'))
           case m.read_content("itype")
           when 'STATUS'
             unless m.read_property("current").nil? && m.read_property("desired").nil?
@@ -577,6 +580,7 @@ def tell(comm, options)
       nodes_retrying = []
       controller.on_message do |m|
         if m.operation == :inform
+          next unless options[:target_nodes].include?(m.read_property('node_name'))
           case m.read_content("itype")
           when 'STATUS'
             unless m.read_property("current").nil? && m.read_property("desired").nil?
@@ -685,6 +689,7 @@ def stat(comm, options)
       nodes_retrying = []
       controller.on_message do |m|
         if m.operation == :inform
+          next unless options[:target_nodes].include?(m.read_property('node_name'))
           case m.read_content("itype")
           when 'STATUS'
             unless m.read_property("current").nil?
@@ -802,7 +807,10 @@ def shut_down(comm)
   comm.disconnect
 end
 
-OmfCommon.init(@config[:operationMode], {communication: { url: "xmpp://#{@xmpp[:script_user]}:#{@xmpp[:password]}@#{@xmpp[:server]}", auth: {}}, logging: nil }) do
+@url = "xmpp://#{@xmpp[:script_user]}:#{@xmpp[:password]}@#{@xmpp[:server]}"
+# @url = "amqp://testserver"
+
+OmfCommon.init(@config[:operationMode], {communication: { url: @url, auth: {}}, logging: nil }) do
   OmfCommon.comm.on_connected do |comm|
     OmfCommon::Auth::CertificateStore.instance.register_default_certs(trusted_roots)
     entity.resource_id = OmfCommon.comm.local_topic.address
