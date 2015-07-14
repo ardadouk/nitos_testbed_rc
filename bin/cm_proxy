@@ -53,7 +53,7 @@ class CmPDP
         return msg# next
       end
 
-      node_name = msg.properties.state.node
+      node_name = msg.properties.respond_to?(:state) ? msg.properties.state.node : msg.properties[:state][:node]
       broker = @config[:broker_url]
 
       uri = URI.parse("#{broker}/resources/nodes?name=#{node_name}")
@@ -104,7 +104,11 @@ class CmPDP
       
       if acc == 'root'
         debug "AUTH PASSED (root account)"
-        msg.properties.state.node = nod
+        if msg.properties.respond_to?(:state)
+          msg.properties.state.node = nod
+        else
+          msg.properties[:state][:node] = nod
+        end
         return msg
       end
 
@@ -126,7 +130,11 @@ class CmPDP
         return msg
       else
         debug "AUTH PASSED"
-        msg.properties.state.node = nod
+        if msg.properties.respond_to?(:state)
+          msg.properties.state.node = nod
+        else
+          msg.properties[:state][:node] = nod
+        end
         return msg
       end
       # wait = true
