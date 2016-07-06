@@ -66,6 +66,7 @@ module OmfRc::ResourceProxy::Frisbee #frisbee client
       host = Net::Telnet.new("Host" => client.property.multicast_interface.to_s, "Timeout" => 200, "Prompt" => /[\w().-]*[\$#>:.]\s?(?:\(enable\))?\s*$/)
       while retry_flag < 2
         host.cmd(command.to_s) do |c|
+          puts "$ #{c}"
           if c[0,8] ==  "Progress"
             c = c.split[1]
             client.inform(:status, {

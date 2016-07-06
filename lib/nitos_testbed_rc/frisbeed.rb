@@ -53,14 +53,16 @@ module OmfRc::ResourceProxy::Frisbeed
     end
     debug "Frisbee server is loading image: #{server.property.image}"
 
-    @app = ExecApp.new(server.property.app_id, server.build_command_line, server.property.map_err_to_out) do |event_type, app_id, msg|
+    @app = {} if @app.nil?
+
+    @app[server.uid] = ExecApp.new(server.property.app_id, server.build_command_line, server.property.map_err_to_out) do |event_type, app_id, msg|
       server.process_event(server, event_type, app_id, msg)
     end
   end
 
   hook :before_release do |server|
     begin
-      @app.signal(signal = 'KILL') unless @app.nil?
+      @app[server.uid].signal(signal = 'KILL') unless @app.nil?
     rescue Exception => e
       raise e unless e.message == "No such process"
     ensure
