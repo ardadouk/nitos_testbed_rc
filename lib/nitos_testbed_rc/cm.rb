@@ -137,6 +137,7 @@ module OmfRc::ResourceProxy::CM
     end
     begin
       debug "Shutting down node '#{node[:node_name]}' through ssh."
+      raise "lte" if node[:name].start_with("e_node_b")
       ssh = Net::SSH.start(node[:node_ip], 'root')#, :password => @password)
       resp = ssh.exec!(SHUTDOWN_CMD)
       ssh.close
